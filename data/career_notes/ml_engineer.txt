@@ -1,0 +1,31 @@
+ROLE GUIDE: MACHINE LEARNING ENGINEER
+
+Overview:
+A Machine Learning Engineer builds and deploys models into production systems. This role blends software engineering with data science, so both coding skill and ML theory matter.
+
+Core Skills Required:
+- Strong Python programming (not just notebooks — writing clean, modular code)
+- ML fundamentals: regression, classification, clustering, evaluation metrics
+- Frameworks: Scikit-learn for classical ML, TensorFlow or PyTorch for deep learning
+- Model deployment basics: REST APIs (FastAPI/Flask), Docker containers
+- Version control with Git, and familiarity with cloud platforms (AWS/GCP/Azure) is a plus
+- Understanding of data pipelines and feature engineering
+
+How to Switch Into This Role:
+1. Complete 2-3 end-to-end ML projects: data collection → model training → deployment (not just a notebook that stops at accuracy score).
+2. Learn to wrap a trained model in a simple API and deploy it, even locally with Docker.
+3. Build a GitHub portfolio with clean READMEs explaining your approach and results.
+4. Study ML system design basics (how a recommendation system or fraud detector works end-to-end).
+
+Common Interview Topics:
+- Coding rounds (Python, sometimes DSA-lite)
+- ML theory: bias-variance tradeoff, overfitting, evaluation metrics (precision/recall/F1)
+- Take-home projects or case studies on a given dataset
+- System design: "How would you build a fraud detection system?"
+
+Typical Weak Points for Beginners:
+- Projects that stop at model training with no deployment or productionization
+- Not knowing how to explain model choices ("why this algorithm over another")
+- Weak fundamentals in evaluation metrics beyond accuracy
+
+Related Roles: Data Scientist, MLOps Engineer, AI Engineer, Applied Scientist

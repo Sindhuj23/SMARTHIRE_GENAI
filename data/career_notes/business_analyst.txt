@@ -1,0 +1,31 @@
+ROLE GUIDE: BUSINESS ANALYST
+
+Overview:
+A Business Analyst bridges the gap between business needs and technical solutions. The role focuses more on requirement gathering, process improvement, and stakeholder communication than on deep coding.
+
+Core Skills Required:
+- Requirement gathering and documentation (writing clear user stories/specs)
+- Basic SQL and Excel for data checks, not heavy engineering
+- Process mapping tools (flowcharts, BPMN basics)
+- Strong verbal and written communication skills
+- Familiarity with Agile/Scrum ways of working
+- Tools: Jira, Confluence, PowerPoint for presenting findings
+
+How to Switch Into This Role:
+1. Practice writing clear requirement documents and user stories for a sample product idea.
+2. Learn basic SQL and Excel — enough to validate data, not build pipelines.
+3. Get comfortable presenting a problem, options, and a recommendation in a short deck.
+4. Highlight any past experience coordinating between teams, even informally, on your resume.
+
+Common Interview Topics:
+- "Tell me about a time you gathered requirements from a stakeholder with unclear needs."
+- Case studies on improving a business process
+- Basic SQL query questions
+- Questions on prioritization frameworks (e.g. MoSCoW)
+
+Typical Weak Points for Beginners:
+- Too technical in interviews when the interviewer wants a business-first answer
+- Vague requirement documents without measurable acceptance criteria
+- Not asking clarifying questions before jumping to solutions
+
+Related Roles: Product Analyst, Product Owner, Data Analyst, Project Coordinator

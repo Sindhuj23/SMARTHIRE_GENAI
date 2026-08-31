@@ -1,0 +1,32 @@
+SKILL ROADMAP: BUILDING A STRONG TECH RESUME AND INTERVIEW PROFILE
+
+Resume Fundamentals:
+- Keep it to one page for entry-level and early-career roles.
+- Every bullet point should follow: Action verb + what you did + measurable result, where possible.
+  Weak: "Worked on a dashboard project."
+  Strong: "Built a Power BI dashboard that reduced weekly reporting time by 30%."
+- List skills that match the job description's language exactly (many companies use automated resume screening that looks for keyword matches).
+- Put your most relevant/recent project or experience first, not chronologically buried.
+
+Building a Portfolio (for Data/AI/ML roles):
+- 2-3 solid projects beat 10 shallow ones. Depth matters more than quantity.
+- Every project should have a public GitHub repo with a clear README: problem statement, approach, tools used, results, and what you'd improve.
+- Deploy at least one project so it's clickable, not just code (Streamlit Cloud, Hugging Face Spaces, or similar).
+- Include a mix: one that shows technical depth (e.g. a model you built), and one that shows end-to-end thinking (e.g. a deployed app).
+
+General Interview Preparation:
+- Prepare a 60-90 second "walk me through your background" answer — this gets asked almost everywhere.
+- For technical roles, expect a mix of: coding/technical questions, a project deep-dive, and behavioral questions.
+- Use the STAR method (Situation, Task, Action, Result) for behavioral questions.
+- Always prepare 2-3 thoughtful questions to ask the interviewer at the end.
+
+Common Mistakes Across All Roles:
+- Applying with a generic resume that isn't tailored to the specific job posting.
+- Being unable to explain your own project in detail when asked follow-up questions.
+- Undervaluing soft skills like communication and collaboration in technical interviews.
+- Not researching the company's product or industry before the interview.
+
+How to Choose a Target Role:
+- Compare your current strongest skills against 3-4 role guides.
+- Pick the role with the smallest skill gap first if you need to start earning experience quickly.
+- It's normal to pivot roles early in a career — first job doesn't have to be a permanent choice.

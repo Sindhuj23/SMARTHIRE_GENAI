@@ -1,0 +1,32 @@
+ROLE GUIDE: GENERATIVE AI / LLM ENGINEER (ENTRY-LEVEL)
+
+Overview:
+This is an emerging role focused on building applications powered by large language models (LLMs) — chatbots, RAG systems, AI agents, and content generation tools. It's less about training models from scratch and more about integrating and orchestrating existing models effectively.
+
+Core Skills Required:
+- Prompt engineering: zero-shot, few-shot, chain-of-thought techniques
+- Working with LLM APIs (OpenAI, Anthropic Claude, Google Gemini)
+- Embeddings and vector databases (FAISS, Pinecone, Chroma) for semantic search
+- RAG (Retrieval-Augmented Generation) pipeline design
+- Orchestration frameworks: LangChain or LlamaIndex
+- Basic app deployment: Streamlit, FastAPI, or similar for building demos
+- Understanding of guardrails and responsible AI practices (input validation, hallucination checks)
+
+How to Switch Into This Role:
+1. Build at least one deployed RAG project (e.g. a PDF Q&A bot or a document-grounded chatbot).
+2. Learn to measure and improve prompt quality — keep a before/after comparison to show your process.
+3. Get comfortable with vector search concepts: chunking, embeddings, similarity search.
+4. Deploy a project publicly (Streamlit Community Cloud, Hugging Face Spaces) and share the GitHub repo.
+
+Common Interview Topics:
+- Explain how RAG works end-to-end
+- Prompt engineering exercises (write a prompt to solve X)
+- Questions about hallucination and how to reduce it
+- Walkthrough of your deployed project and design decisions
+
+Typical Weak Points for Beginners:
+- Projects that only call an LLM API without any retrieval or grounding (not a "real" RAG project)
+- No evaluation of answer quality — just a demo with no metrics
+- Missing guardrails, so the app answers unrelated or unsafe questions
+
+Related Roles: AI Engineer, Applied AI Developer, Conversational AI Engineer, ML Engineer (GenAI focus)

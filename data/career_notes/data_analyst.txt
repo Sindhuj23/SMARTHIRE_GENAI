@@ -1,0 +1,31 @@
+ROLE GUIDE: DATA ANALYST
+
+Overview:
+A Data Analyst collects, cleans, and interprets data to help organizations make better decisions. Entry-level roles focus heavily on reporting and dashboarding, while senior roles move toward predictive analysis and strategy.
+
+Core Skills Required:
+- SQL (joins, aggregations, window functions) — the single most important skill for this role
+- Excel (pivot tables, VLOOKUP/XLOOKUP, basic formulas)
+- Python or R for data manipulation (Pandas is the most common library)
+- Data visualization tools: Power BI or Tableau
+- Statistics fundamentals: mean, median, standard deviation, correlation, hypothesis testing
+- Strong communication skills to present findings to non-technical stakeholders
+
+How to Switch Into This Role:
+1. Learn SQL first — it is used in nearly every data analyst job posting.
+2. Build 2-3 portfolio projects using public datasets (Kaggle is a good source) and publish dashboards on Power BI or Tableau Public.
+3. Practice explaining your findings in plain language, not just technical jargon.
+4. Apply for internships or junior analyst roles even without a data-specific degree; many analysts come from finance, business, or engineering backgrounds.
+
+Common Interview Topics:
+- SQL query writing (medium-difficulty joins and subqueries)
+- Case studies: "How would you analyze a drop in sales?"
+- Basic statistics questions
+- Walkthrough of a past project or dashboard
+
+Typical Weak Points for Beginners:
+- Weak SQL skills (most common gap)
+- Portfolio projects that only clean data but don't draw a conclusion or recommendation
+- Not tailoring resume bullet points with measurable outcomes (e.g. "reduced reporting time by 20%")
+
+Related Roles: Business Analyst, BI Developer, Data Scientist (with more ML), Reporting Analyst
