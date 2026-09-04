@@ -16,7 +16,7 @@ else:
 if "MODEL_NAME" in st.secrets:
     MODEL_NAME = st.secrets["MODEL_NAME"]
 else:
-    MODEL_NAME = os.getenv("MODEL_NAME", "gemini-2.5-flash")
+    MODEL_NAME = os.getenv("MODEL_NAME", "gemini-3.6-flash")
 
 # Data directories setup
 DATA_DIR = PROJECT_ROOT / "data"
