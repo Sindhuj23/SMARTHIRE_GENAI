@@ -83,9 +83,15 @@ Resume:
 {resume_text}
 """
 
-    # Backup models if primary MODEL_NAME experiences high demand / 503 errors
-    fallback_models = [MODEL_NAME, "gemini-1.5-flash", "gemini-2.0-flash"]
-    models_to_try = list(dict.fromkeys(fallback_models))
+    # Ensure model strings don't include 'models/' prefix and prioritize working modern models
+    raw_models = [MODEL_NAME, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+    models_to_try = []
+    
+    for m in raw_models:
+        if m:
+            clean_m = str(m).replace("models/", "").strip()
+            if clean_m not in models_to_try:
+                models_to_try.append(clean_m)
 
     last_exception = None
 
@@ -105,13 +111,18 @@ Resume:
             except Exception as e:
                 last_exception = e
                 err_str = str(e)
+                
+                # If 404 NOT_FOUND occurs, break attempt loop and switch to next model immediately
+                if "404" in err_str or "NOT_FOUND" in err_str:
+                    break
+
                 # Retry if server is unavailable (503) or rate-limited (429)
                 if "503" in err_str or "UNAVAILABLE" in err_str or "429" in err_str:
                     time.sleep(2 * (attempt + 1))  # Exponential delay (2s, 4s, 6s)
                     continue
                 else:
-                    raise e
+                    break  # Try next model for other unhandled model-specific errors
 
     raise RuntimeError(
-        f"Resume parsing failed due to high server load: {last_exception}"
+        f"Resume parsing failed across all attempted models. Last error: {last_exception}"
     )
