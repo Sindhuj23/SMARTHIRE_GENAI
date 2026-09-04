@@ -693,14 +693,17 @@ elif page == "💼 Job Matches":
 
             if results.empty:
 
-                st.warning(
-                    "⚠️ No matching jobs found."
+                st.error(
+                    f"❌ **Job Role Not Found!** No jobs matching **'{job_role}'** were found in the dataset."
+                )
+                st.info(
+                    "💡 **Tip:** Try searching for standard job roles like **Data Analyst**, **Software Engineer**, **Data Scientist**, **Web Developer**, or **Java Developer**."
                 )
 
             else:
 
                 st.success(
-                    f"🎉 Found {len(results)} matching jobs!"
+                    f"🎉 Found {len(results)} matching jobs for '{job_role}'!"
                 )
 
                 for _, row in results.iterrows():
