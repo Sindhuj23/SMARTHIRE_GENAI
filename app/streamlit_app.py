@@ -1,6 +1,4 @@
-Here is the corrected code with fixes applied exclusively for runtime errors and edge-case bugs (such as path resolution issues when running from root vs subdirectories, handling empty evaluation metrics crashing `st.columns(0)`, and preventing `pandas` NaN/None values from displaying as `"nan"` text):
 
-```python
 import sys
 from pathlib import Path
 import math
@@ -1120,4 +1118,4 @@ elif page == "📊 System Evaluation":
                     f"❌ Evaluation failed: {e}"
                 )
 
-```
+
