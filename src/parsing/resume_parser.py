@@ -84,7 +84,7 @@ Resume:
 """
 
     # Ensure model strings don't include 'models/' prefix and prioritize working modern models
-    raw_models = [MODEL_NAME, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+    raw_models = [MODEL_NAME, "gemini-3.6-flash"]
     models_to_try = []
     
     for m in raw_models:
