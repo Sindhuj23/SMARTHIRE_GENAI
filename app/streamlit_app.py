@@ -56,13 +56,13 @@ st.markdown(
         background-color: #0e1117;
     }
 
-    /* MODERATE TOP PADDING - ENOUGH TO CLEAR THE TOOLBAR */
-
     .block-container {
         padding-top: 2rem !important;
     }
 
-    /* MAIN TITLE - NO GLOW, COMPACT */
+    /* =====================================================
+       MAIN TITLE
+       ===================================================== */
 
     .main-title {
         font-size: 40px !important;
@@ -76,18 +76,36 @@ st.markdown(
         filter: none !important;
     }
 
-    /* SUBTITLE - COMPACT */
+    /* =====================================================
+       SUBTITLE
+       ===================================================== */
 
     .subtitle {
         text-align: center;
         font-size: 18px;
-        color: #c4b5fd;
+        font-weight: 600;
+        color: #c4b5fd !important;
         margin-top: 0px;
         margin-bottom: 15px;
         text-shadow: none !important;
     }
 
-    /* DASHBOARD CARDS - COMPACT */
+    /* =====================================================
+       SECTION TITLES
+       Same purple as main SmartHire title
+       ===================================================== */
+
+    .section-title {
+        color: #8b5cf6 !important;
+        font-size: 30px !important;
+        font-weight: 800 !important;
+        margin-top: 10px !important;
+        margin-bottom: 15px !important;
+    }
+
+    /* =====================================================
+       DASHBOARD CARDS
+       ===================================================== */
 
     .card {
         background-color: #161b22;
@@ -97,7 +115,9 @@ st.markdown(
         margin-bottom: 12px;
     }
 
-    /* SKILL TAGS */
+    /* =====================================================
+       SKILL TAGS
+       ===================================================== */
 
     .skill {
         display: inline-block;
@@ -108,13 +128,29 @@ st.markdown(
         border: 1px solid #30363d;
     }
 
-    /* SIDEBAR TITLE - NO GLOW */
+    /* =====================================================
+       SIDEBAR TITLE
+       ===================================================== */
 
     [data-testid="stSidebar"] h2 {
         color: #d8b4fe !important;
         text-shadow: none !important;
         box-shadow: none !important;
         filter: none !important;
+    }
+
+    /* =====================================================
+       RESUME IMPROVEMENT RESULT BOX
+       ===================================================== */
+
+    .improvement-box {
+        background-color: #161b22;
+        border: 1px solid #30363d;
+        border-left: 4px solid #8b5cf6;
+        border-radius: 12px;
+        padding: 18px;
+        margin-top: 15px;
+        margin-bottom: 15px;
     }
 
     </style>
@@ -149,8 +185,11 @@ with st.sidebar:
     st.markdown("---")
 
     if st.session_state.profile is not None:
+
         st.success("✅ Resume profile loaded.")
+
     else:
+
         st.info(
             "💡 Analyze your resume first to unlock personalized features."
         )
@@ -202,6 +241,7 @@ if page == "🏠 Dashboard":
     col1, col2, col3 = st.columns(3)
 
     with col1:
+
         st.markdown("### 📄")
         st.markdown("**Resume Analyzer**")
         st.write(
@@ -209,6 +249,7 @@ if page == "🏠 Dashboard":
         )
 
     with col2:
+
         st.markdown("### 👤")
         st.markdown("**My Profile**")
         st.write(
@@ -216,6 +257,7 @@ if page == "🏠 Dashboard":
         )
 
     with col3:
+
         st.markdown("### 💼")
         st.markdown("**Job Matching**")
         st.write(
@@ -225,6 +267,7 @@ if page == "🏠 Dashboard":
     col4, col5, col6 = st.columns(3)
 
     with col4:
+
         st.markdown("### 🤖")
         st.markdown("**AI Career Mentor**")
         st.write(
@@ -232,6 +275,7 @@ if page == "🏠 Dashboard":
         )
 
     with col5:
+
         st.markdown("### ✨")
         st.markdown("**Resume Improvement**")
         st.write(
@@ -239,6 +283,7 @@ if page == "🏠 Dashboard":
         )
 
     with col6:
+
         st.markdown("### 📊")
         st.markdown("**System Evaluation**")
         st.write(
@@ -252,7 +297,10 @@ if page == "🏠 Dashboard":
 
 elif page == "📄 Resume Analyzer":
 
-    st.header("📄 Resume Analyzer")
+    st.markdown(
+        '<div class="section-title">📄 Resume Analyzer</div>',
+        unsafe_allow_html=True
+    )
 
     st.write(
         "Upload your PDF or DOCX resume."
@@ -299,15 +347,10 @@ elif page == "📄 Resume Analyzer":
                             resume_text
                         )
 
-                        # SAVE PROFILE PERMANENTLY
-                        # FOR THE CURRENT STREAMLIT SESSION
-
                         st.session_state.profile = profile
                         st.session_state.resume_text = resume_text
 
-                        # Clear old CV suggestions when a new resume
-                        # is analyzed
-
+                        # Clear previous AI suggestions
                         st.session_state.cv_suggestions = None
 
                         st.success(
@@ -332,11 +375,10 @@ elif page == "📄 Resume Analyzer":
 
 elif page == "👤 My Profile":
 
-    st.header("👤 My AI Profile")
-
-    # IMPORTANT:
-    # Check the actual value instead of only checking
-    # whether the key exists.
+    st.markdown(
+        '<div class="section-title">👤 My AI Profile</div>',
+        unsafe_allow_html=True
+    )
 
     if st.session_state.profile is None:
 
@@ -516,7 +558,7 @@ elif page == "👤 My Profile":
             )
 
         # =================================================
-        # DELETE RESUME & PROFILE
+        # DELETE PROFILE
         # =================================================
 
         st.markdown("---")
@@ -550,7 +592,10 @@ elif page == "👤 My Profile":
 
 elif page == "💼 Job Matches":
 
-    st.header("💼 AI Job Matches")
+    st.markdown(
+        '<div class="section-title">💼 AI Job Matches</div>',
+        unsafe_allow_html=True
+    )
 
     if st.session_state.profile is None:
 
@@ -760,7 +805,15 @@ elif page == "💼 Job Matches":
 
 elif page == "✨ Resume Improvement":
 
-    st.header("✨ AI Resume Improvement")
+    # =====================================================
+    # TITLE
+    # Same color as main title #8b5cf6
+    # =====================================================
+
+    st.markdown(
+        '<div class="section-title">✨ AI Resume Improvement</div>',
+        unsafe_allow_html=True
+    )
 
     if st.session_state.resume_text is None:
 
@@ -789,14 +842,12 @@ elif page == "✨ Resume Improvement":
                         st.session_state.resume_text
                     )
 
+                    # Save only
+                    # DO NOT DISPLAY HERE
                     st.session_state.cv_suggestions = suggestions
 
-                    st.subheader(
-                        "💡 AI Resume Improvement"
-                    )
-
-                    st.markdown(
-                        suggestions
+                    st.success(
+                        "🎉 Resume improvement suggestions generated!"
                     )
 
                 except Exception as e:
@@ -805,12 +856,25 @@ elif page == "✨ Resume Improvement":
                         f"❌ Could not generate resume suggestions: {e}"
                     )
 
+        # =================================================
+        # DISPLAY RESULT ONLY ONCE
+        # =================================================
+
         if st.session_state.cv_suggestions is not None:
 
             st.markdown("---")
 
-            st.subheader(
-                "📋 Latest Suggestions"
+            st.markdown(
+                """
+                <div class="improvement-box">
+                    <div class="section-title"
+                         style="font-size:24px !important;
+                                margin-top:0px !important;">
+                        💡 AI Resume Improvement
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
             )
 
             st.markdown(
@@ -824,7 +888,10 @@ elif page == "✨ Resume Improvement":
 
 elif page == "🤖 AI Career Mentor":
 
-    st.header("🤖 AI Career Mentor")
+    st.markdown(
+        '<div class="section-title">🤖 AI Career Mentor</div>',
+        unsafe_allow_html=True
+    )
 
     st.write(
         "Ask questions about careers, jobs, skills, interviews, "
@@ -915,7 +982,10 @@ elif page == "🤖 AI Career Mentor":
 
 elif page == "📊 System Evaluation":
 
-    st.header("📊 System Evaluation")
+    st.markdown(
+        '<div class="section-title">📊 System Evaluation</div>',
+        unsafe_allow_html=True
+    )
 
     st.write(
         "Evaluate the performance and quality of the SmartHire GenAI system."
