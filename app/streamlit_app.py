@@ -1,4 +1,3 @@
-
 import sys
 from pathlib import Path
 import math
@@ -58,6 +57,9 @@ if "cv_suggestions" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
+if "job_results" not in st.session_state:
+    st.session_state.job_results = None
+
 
 # =========================================================
 # CSS
@@ -107,7 +109,6 @@ st.markdown(
 
     /* =====================================================
        SECTION TITLES
-       Same purple as main SmartHire title
        ===================================================== */
 
     .section-title {
@@ -365,8 +366,9 @@ elif page == "📄 Resume Analyzer":
                         st.session_state.profile = profile
                         st.session_state.resume_text = resume_text
 
-                        # Clear previous AI suggestions
+                        # Clear previous AI suggestions & job results
                         st.session_state.cv_suggestions = None
+                        st.session_state.job_results = None
 
                         st.success(
                             "🎉 Resume analyzed successfully!"
@@ -593,6 +595,7 @@ elif page == "👤 My Profile":
             st.session_state.resume_text = None
             st.session_state.cv_suggestions = None
             st.session_state.messages = []
+            st.session_state.job_results = None
 
             st.success(
                 "✅ Resume and profile deleted successfully."
@@ -675,129 +678,7 @@ elif page == "💼 Job Matches":
                         top_n=number_of_jobs
                     )
 
-                    if results is None or results.empty:
-
-                        st.warning(
-                            "⚠️ No matching jobs found."
-                        )
-
-                    else:
-
-                        st.success(
-                            f"🎉 Found {len(results)} matching jobs!"
-                        )
-
-                        for _, row in results.iterrows():
-
-                            job_title = get_clean_field(
-                                row,
-                                "jobtitle",
-                                "Job Title Not Available"
-                            )
-
-                            company = get_clean_field(
-                                row,
-                                "company",
-                                "Company Not Available"
-                            )
-
-                            job_location = get_clean_field(
-                                row,
-                                "joblocation_address",
-                                "Location Not Available"
-                            )
-
-                            score = row.get(
-                                "match_score",
-                                0
-                            )
-
-                            job_skills = get_clean_field(
-                                row,
-                                "skills",
-                                ""
-                            )
-
-                            description = get_clean_field(
-                                row,
-                                "jobdescription",
-                                ""
-                            )
-
-                            education = get_clean_field(
-                                row,
-                                "education",
-                                ""
-                            )
-
-                            experience = get_clean_field(
-                                row,
-                                "experience",
-                                ""
-                            )
-
-                            payrate = get_clean_field(
-                                row,
-                                "payrate",
-                                ""
-                            )
-
-                            with st.container(
-                                border=True
-                            ):
-
-                                st.subheader(
-                                    f"💼 {job_title}"
-                                )
-
-                                st.write(
-                                    f"🏢 **Company:** {company}"
-                                )
-
-                                st.write(
-                                    f"📍 **Location:** {job_location}"
-                                )
-
-                                st.write(
-                                    f"🎯 **Match Score:** {score}"
-                                )
-
-                                if education:
-
-                                    st.write(
-                                        f"🎓 **Education:** {education}"
-                                    )
-
-                                if experience:
-
-                                    st.write(
-                                        f"💼 **Experience:** {experience}"
-                                    )
-
-                                if payrate:
-
-                                    st.write(
-                                        f"💰 **Pay:** {payrate}"
-                                    )
-
-                                if job_skills:
-
-                                    st.write(
-                                        f"🛠️ **Required Skills:** {job_skills}"
-                                    )
-
-                                if description:
-
-                                    if len(description) > 500:
-
-                                        description = (
-                                            description[:500]
-                                            + "..."
-                                        )
-
-                                    st.write(
-                                        f"📝 **Description:** {description}"
-                                    )
+                    st.session_state.job_results = results
 
                 except Exception as e:
 
@@ -805,17 +686,141 @@ elif page == "💼 Job Matches":
                         f"❌ Job matching failed: {e}"
                     )
 
+        # Render results if available
+        results = st.session_state.job_results
+
+        if results is not None:
+
+            if results.empty:
+
+                st.warning(
+                    "⚠️ No matching jobs found."
+                )
+
+            else:
+
+                st.success(
+                    f"🎉 Found {len(results)} matching jobs!"
+                )
+
+                for _, row in results.iterrows():
+
+                    job_title = get_clean_field(
+                        row,
+                        "jobtitle",
+                        "Job Title Not Available"
+                    )
+
+                    company = get_clean_field(
+                        row,
+                        "company",
+                        "Company Not Available"
+                    )
+
+                    job_location = get_clean_field(
+                        row,
+                        "joblocation_address",
+                        "Location Not Available"
+                    )
+
+                    score = row.get(
+                        "match_score",
+                        0
+                    )
+
+                    job_skills = get_clean_field(
+                        row,
+                        "skills",
+                        ""
+                    )
+
+                    description = get_clean_field(
+                        row,
+                        "jobdescription",
+                        ""
+                    )
+
+                    education = get_clean_field(
+                        row,
+                        "education",
+                        ""
+                    )
+
+                    experience = get_clean_field(
+                        row,
+                        "experience",
+                        ""
+                    )
+
+                    payrate = get_clean_field(
+                        row,
+                        "payrate",
+                        ""
+                    )
+
+                    with st.container(
+                        border=True
+                    ):
+
+                        st.subheader(
+                            f"💼 {job_title}"
+                        )
+
+                        st.write(
+                            f"🏢 **Company:** {company}"
+                        )
+
+                        st.write(
+                            f"📍 **Location:** {job_location}"
+                        )
+
+                        st.write(
+                            f"🎯 **Match Score:** {score}"
+                        )
+
+                        if education:
+
+                            st.write(
+                                f"🎓 **Education:** {education}"
+                            )
+
+                        if experience:
+
+                            st.write(
+                                f"💼 **Experience:** {experience}"
+                            )
+
+                        if payrate:
+
+                            st.write(
+                                f"💰 **Pay:** {payrate}"
+                            )
+
+                        if job_skills:
+
+                            st.write(
+                                f"🛠️ **Required Skills:** {job_skills}"
+                            )
+
+                        if description:
+
+                            if len(description) > 500:
+
+                                description = (
+                                    description[:500]
+                                    + "..."
+                                )
+
+                            st.write(
+                                f"📝 **Description:** {description}"
+                            )
+
 
 # =========================================================
 # RESUME IMPROVEMENT
 # =========================================================
 
 elif page == "✨ Resume Improvement":
-
-    # =====================================================
-    # TITLE
-    # Same color as main title #8b5cf6
-    # =====================================================
 
     st.markdown(
         '<div class="section-title">✨ AI Resume Improvement</div>',
@@ -849,8 +854,6 @@ elif page == "✨ Resume Improvement":
                         st.session_state.resume_text
                     )
 
-                    # Save only
-                    # DO NOT DISPLAY HERE
                     st.session_state.cv_suggestions = suggestions
 
                     st.success(
@@ -1117,5 +1120,3 @@ elif page == "📊 System Evaluation":
                 st.error(
                     f"❌ Evaluation failed: {e}"
                 )
-
-
