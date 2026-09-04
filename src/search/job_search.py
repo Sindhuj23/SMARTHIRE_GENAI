@@ -1,411 +1,119 @@
 import pandas as pd
-from pathlib import Path
+import numpy as np
 import re
+from pathlib import Path
 
-
-# =========================================================
-# PROJECT PATH
-# =========================================================
-
+# Paths
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-
 DATA_DIR = PROJECT_ROOT / "data"
-JOBS_DIR = DATA_DIR / "jobs"
+JOBS_CSV = DATA_DIR / "jobs" / "naukri_com-job_sample.csv"
 
 
-# =========================================================
-# FIND JOB DATASET
-# =========================================================
-
-def find_job_file():
-    """
-    Find the first CSV file inside data/jobs.
-    """
-
-    csv_files = list(JOBS_DIR.glob("*.csv"))
-
-    if not csv_files:
-        return None
-
-    return csv_files[0]
+def normalize_text(text):
+    if pd.isna(text):
+        return ""
+    text = str(text).lower()
+    text = re.sub(r"[^a-z0-9\s]", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
 
 
-# =========================================================
-# LOAD JOB DATASET
-# =========================================================
-
-def load_jobs():
-    """
-    Load jobs from the CSV dataset.
-    """
-
-    job_file = find_job_file()
-
-    if job_file is None:
-        return pd.DataFrame()
+def load_naukri_dataset():
+    """Load and clean dataset."""
+    if not JOBS_CSV.exists():
+        csv_files = list((DATA_DIR / "jobs").glob("*.csv"))
+        if not csv_files:
+            return pd.DataFrame()
+        job_file = csv_files[0]
+    else:
+        job_file = JOBS_CSV
 
     try:
-
-        df = pd.read_csv(
-            job_file,
-            encoding="utf-8",
-            on_bad_lines="skip"
-        )
-
+        df = pd.read_csv(job_file, encoding="utf-8", on_bad_lines="skip")
     except UnicodeDecodeError:
+        df = pd.read_csv(job_file, encoding="latin1", on_bad_lines="skip")
 
-        df = pd.read_csv(
-            job_file,
-            encoding="latin1",
-            on_bad_lines="skip"
-        )
-
-    except Exception:
-
-        return pd.DataFrame()
-
-    # Clean column names
-    df.columns = [
-        str(column).strip()
-        for column in df.columns
-    ]
+    df['jobtitle'] = df['jobtitle'].fillna('')
+    df['company'] = df['company'].fillna('Not Disclosed')
+    df['joblocation_address'] = df['joblocation_address'].fillna('India')
+    df['skills'] = df['skills'].fillna('')
+    df['jobdescription'] = df['jobdescription'].fillna('')
+    df['experience'] = df['experience'].fillna('N/A')
+    df['payrate'] = df['payrate'].fillna('Not Disclosed')
 
     return df
 
 
-# =========================================================
-# FIND RELEVANT TEXT COLUMNS
-# =========================================================
-
-def get_text_columns(df):
-
-    possible_columns = [
-        "job_title",
-        "title",
-        "job",
-        "position",
-        "role",
-        "designation",
-        "skills",
-        "skill",
-        "description",
-        "job_description",
-        "requirements",
-        "location",
-        "company",
-        "company_name"
-    ]
-
-    columns = []
-
-    for column in df.columns:
-
-        column_lower = column.lower()
-
-        for possible in possible_columns:
-
-            if possible in column_lower:
-
-                columns.append(column)
-                break
-
-    return list(dict.fromkeys(columns))
-
-
-# =========================================================
-# FIND LOCATION-SPECIFIC COLUMNS
-# =========================================================
-
-def get_location_columns(df):
+def filter_by_role(df, target_role):
     """
-    Identify columns that represent job location specifically.
+    Strictly filter by target role words in the job title.
+    If no matches exist, returns an empty DataFrame instead of falling back to unrelated jobs.
     """
+    if not target_role or not str(target_role).strip():
+        return pd.DataFrame()
 
-    columns = [
-        column
-        for column in df.columns
-        if "location" in column.lower()
-        or "city" in column.lower()
-        or "country" in column.lower()
-        or "address" in column.lower()
-    ]
+    norm_role = normalize_text(target_role)
+    role_words = [w for w in norm_role.split() if len(w) > 1]
 
-    return columns
+    if not role_words:
+        return pd.DataFrame()
 
+    # STRICT MATCH: ALL keywords typed by user must exist in the job title
+    def strict_title_match(title):
+        norm_title = normalize_text(title)
+        return all(word in norm_title for word in role_words)
 
-# =========================================================
-# NORMALIZE TEXT
-# =========================================================
+    filtered = df[df['jobtitle'].apply(strict_title_match)].copy()
 
-def normalize_text(text):
+    # If role doesn't exist in the dataset, return empty DataFrame (Do NOT fall back to full df)
+    if filtered.empty:
+        return pd.DataFrame()
 
-    if pd.isna(text):
-        return ""
-
-    text = str(text).lower()
-
-    text = re.sub(
-        r"[^a-z0-9+#.\s]",
-        " ",
-        text
-    )
-
-    text = re.sub(
-        r"\s+",
-        " ",
-        text
-    )
-
-    return text.strip()
+    return filtered
 
 
-# =========================================================
-# JOB MATCHING
-# =========================================================
-
-def match_jobs(
-    skills=None,
-    target_role="",
-    location="India",
-    top_n=10
-):
+def match_jobs(skills=None, target_role="Data Analyst", location="India", top_n=10):
     """
-    Match a user's profile against jobs in the dataset strictly for India.
-    Location is locked to India regardless of user input.
+    Match candidate profile strictly against target role in India.
+    Returns empty DataFrame if the role is not found.
     """
+    # PERMANENTLY LOCK LOCATION TO INDIA
+    location = "India"
 
-    # STRICTLY FORCE LOCATION TO INDIA
-    location = "india"
-
-    df = load_jobs()
-
+    df = load_naukri_dataset()
     if df.empty:
         return pd.DataFrame()
 
-    # -----------------------------------------------------
-    # User profile text
-    # -----------------------------------------------------
+    # Strict role filter
+    df_matched = filter_by_role(df, target_role)
 
-    skills = skills or []
-
-    user_skills = [
-        normalize_text(skill)
-        for skill in skills
-        if skill
-    ]
-
-    target_role = normalize_text(
-        target_role
-    )
-
-    # -----------------------------------------------------
-    # Dataset text columns
-    # -----------------------------------------------------
-
-    text_columns = get_text_columns(df)
-
-    if not text_columns:
-
-        text_columns = [
-            column
-            for column in df.columns
-            if df[column].dtype == "object"
-        ]
-
-    location_columns = get_location_columns(df)
-
-    if not location_columns:
-
-        location_columns = text_columns
-
-    # -----------------------------------------------------
-    # STRICT INDIA LOCATION FILTER
-    # -----------------------------------------------------
-
-    def location_matches(row):
-
-        location_text = " ".join(
-            normalize_text(row[column])
-            for column in location_columns
-        )
-
-        # Recognize India or any Indian city/state in the dataset
-        indian_locations = [
-            "india", "bangalore", "bengaluru", "mumbai", "delhi", "pune",
-            "hyderabad", "chennai", "noida", "gurgaon", "gurugram", "kolkata",
-            "ahmedabad", "surat", "jaipur", "chandigarh", "indore", "kochi",
-            "kerala", "coimbatore", "vadodara", "nagpur", "ghaziabad"
-        ]
-
-        return any(loc in location_text for loc in indian_locations)
-
-    filtered_df = df[df.apply(location_matches, axis=1)]
-
-    # Keep filtered Indian jobs if matches found
-    if not filtered_df.empty:
-        df = filtered_df
-
-    # -----------------------------------------------------
-    # Calculate score (role + skills)
-    # -----------------------------------------------------
-
-    scores = []
-
-    for _, row in df.iterrows():
-
-        job_text = " ".join(
-            normalize_text(row[column])
-            for column in text_columns
-        )
-
-        score = 0
-
-        # Target role matching
-        if target_role:
-
-            role_words = target_role.split()
-
-            for word in role_words:
-
-                if len(word) > 2 and word in job_text:
-                    score += 20
-
-        # Skill matching
-        matched_skills = []
-
-        for skill in user_skills:
-
-            if skill and skill in job_text:
-
-                score += 10
-                matched_skills.append(skill)
-
-        scores.append(
-            {
-                "score": score,
-                "matched_skills": matched_skills
-            }
-        )
-
-    # -----------------------------------------------------
-    # Add scores to dataframe
-    # -----------------------------------------------------
-
-    df = df.copy()
-
-    df["match_score"] = [
-        item["score"]
-        for item in scores
-    ]
-
-    df["matched_skills"] = [
-        ", ".join(item["matched_skills"])
-        for item in scores
-    ]
-
-    # -----------------------------------------------------
-    # Sort
-    # -----------------------------------------------------
-
-    df = df.sort_values(
-        by="match_score",
-        ascending=False
-    )
-
-    # Return top jobs
-    return df.head(top_n)
-
-
-# =========================================================
-# SIMPLE SEARCH FUNCTION
-# =========================================================
-
-def search_jobs(
-    query,
-    location="India",
-    top_n=10
-):
-    """
-    Search jobs using a text query strictly for India.
-    """
-
-    # STRICTLY FORCE LOCATION TO INDIA
-    location = "india"
-
-    df = load_jobs()
-
-    if df.empty:
+    # IF ROLE NOT FOUND IN DATASET, RETURN EMPTY DATAFRAME IMMEDIATELY
+    if df_matched.empty:
         return pd.DataFrame()
 
-    query = normalize_text(query)
+    skills_list = skills if isinstance(skills, list) else []
+    norm_skills = [normalize_text(s) for s in skills_list if s]
 
-    text_columns = get_text_columns(df)
-
-    if not text_columns:
-
-        text_columns = [
-            column
-            for column in df.columns
-            if df[column].dtype == "object"
-        ]
-
-    location_columns = get_location_columns(df)
-
-    if not location_columns:
-
-        location_columns = text_columns
-
-    # -----------------------------------------------------
-    # STRICT INDIA LOCATION FILTER
-    # -----------------------------------------------------
-
-    def location_matches(row):
-
-        location_text = " ".join(
-            normalize_text(row[column])
-            for column in location_columns
-        )
-
-        indian_locations = [
-            "india", "bangalore", "bengaluru", "mumbai", "delhi", "pune",
-            "hyderabad", "chennai", "noida", "gurgaon", "gurugram", "kolkata",
-            "ahmedabad", "surat", "jaipur", "chandigarh", "indore", "kochi",
-            "kerala", "coimbatore", "vadodara", "nagpur", "ghaziabad"
-        ]
-
-        return any(loc in location_text for loc in indian_locations)
-
-    filtered_df = df[df.apply(location_matches, axis=1)]
-
-    if not filtered_df.empty:
-        df = filtered_df
-
+    # Calculate match score for found jobs
     scores = []
+    norm_target_role = normalize_text(target_role)
 
-    for _, row in df.iterrows():
+    for _, row in df_matched.iterrows():
+        job_title = normalize_text(row['jobtitle'])
+        job_text = normalize_text(f"{row['jobdescription']} {row['skills']} {row['company']}")
 
-        job_text = " ".join(
-            normalize_text(row[column])
-            for column in text_columns
-        )
+        score = 60  # Base score for passing exact title match
 
-        score = 0
+        if norm_target_role == job_title:
+            score += 20
 
-        for word in query.split():
+        for skill in norm_skills:
+            if skill and (skill in job_text or skill in job_title):
+                score += 5
 
-            if len(word) > 2 and word in job_text:
+        scores.append(min(score, 100))
 
-                score += 1
+    df_matched = df_matched.copy()
+    df_matched["match_score"] = scores
 
-        scores.append(score)
-
-    df = df.copy()
-
-    df["match_score"] = scores
-
-    df = df.sort_values(
-        by="match_score",
-        ascending=False
-    )
-
-    return df.head(top_n)
+    df_sorted = df_matched.sort_values(by="match_score", ascending=False)
+    return df_sorted.head(top_n)
