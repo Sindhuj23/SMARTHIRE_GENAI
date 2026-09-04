@@ -118,9 +118,7 @@ def get_text_columns(df):
 
 def get_location_columns(df):
     """
-    Identify columns that represent job location specifically,
-    so location filtering doesn't accidentally match text in
-    skills or descriptions.
+    Identify columns that represent job location specifically.
     """
 
     columns = [
@@ -168,22 +166,20 @@ def normalize_text(text):
 def match_jobs(
     skills=None,
     target_role="",
-    location="",
+    location="India",
     top_n=10
 ):
     """
-    Match a user's profile against jobs in the dataset.
-
-    If a location is provided, it first tries a strict match. 
-    If no jobs match the location strictly, it relaxes the location 
-    constraint and falls back to matching by role and skills 
-    so the user always receives relevant results.
+    Match a user's profile against jobs in the dataset strictly for India.
+    Location is locked to India regardless of user input.
     """
+
+    # STRICTLY FORCE LOCATION TO INDIA
+    location = "india"
 
     df = load_jobs()
 
     if df.empty:
-
         return pd.DataFrame()
 
     # -----------------------------------------------------
@@ -200,10 +196,6 @@ def match_jobs(
 
     target_role = normalize_text(
         target_role
-    )
-
-    location = normalize_text(
-        location
     )
 
     # -----------------------------------------------------
@@ -224,36 +216,34 @@ def match_jobs(
 
     if not location_columns:
 
-        # No dedicated location column exists in this
-        # dataset — fall back to searching all text columns
-        # for the location term.
         location_columns = text_columns
 
     # -----------------------------------------------------
-    # FLEXIBLE LOCATION FILTER WITH FALLBACK
-    # -----------------------------------------------------
-    # Tries strict location filtering first. If it yields results,
-    # keeps them. If it yields zero results, bypasses the strict 
-    # location block so role and skills can still match.
+    # STRICT INDIA LOCATION FILTER
     # -----------------------------------------------------
 
-    if location:
+    def location_matches(row):
 
-        def location_matches(row):
+        location_text = " ".join(
+            normalize_text(row[column])
+            for column in location_columns
+        )
 
-            location_text = " ".join(
-                normalize_text(row[column])
-                for column in location_columns
-            )
+        # Recognize India or any Indian city/state in the dataset
+        indian_locations = [
+            "india", "bangalore", "bengaluru", "mumbai", "delhi", "pune",
+            "hyderabad", "chennai", "noida", "gurgaon", "gurugram", "kolkata",
+            "ahmedabad", "surat", "jaipur", "chandigarh", "indore", "kochi",
+            "kerala", "coimbatore", "vadodara", "nagpur", "ghaziabad"
+        ]
 
-            return location in location_text
+        return any(loc in location_text for loc in indian_locations)
 
-        filtered_df = df[df.apply(location_matches, axis=1)]
+    filtered_df = df[df.apply(location_matches, axis=1)]
 
-        if not filtered_df.empty:
-            df = filtered_df
-        # If strict location match is empty, we don't return empty; 
-        # we let it fall through to score by role/skills across the dataset.
+    # Keep filtered Indian jobs if matches found
+    if not filtered_df.empty:
+        df = filtered_df
 
     # -----------------------------------------------------
     # Calculate score (role + skills)
@@ -332,24 +322,22 @@ def match_jobs(
 
 def search_jobs(
     query,
-    location="",
+    location="India",
     top_n=10
 ):
     """
-    Search jobs using a text query. If a location is given,
-    it filters by location if available, with a safe fallback 
-    to prevent empty results.
+    Search jobs using a text query strictly for India.
     """
+
+    # STRICTLY FORCE LOCATION TO INDIA
+    location = "india"
 
     df = load_jobs()
 
     if df.empty:
-
         return pd.DataFrame()
 
     query = normalize_text(query)
-
-    location = normalize_text(location)
 
     text_columns = get_text_columns(df)
 
@@ -368,24 +356,29 @@ def search_jobs(
         location_columns = text_columns
 
     # -----------------------------------------------------
-    # FLEXIBLE LOCATION FILTER WITH FALLBACK
+    # STRICT INDIA LOCATION FILTER
     # -----------------------------------------------------
 
-    if location:
+    def location_matches(row):
 
-        def location_matches(row):
+        location_text = " ".join(
+            normalize_text(row[column])
+            for column in location_columns
+        )
 
-            location_text = " ".join(
-                normalize_text(row[column])
-                for column in location_columns
-            )
+        indian_locations = [
+            "india", "bangalore", "bengaluru", "mumbai", "delhi", "pune",
+            "hyderabad", "chennai", "noida", "gurgaon", "gurugram", "kolkata",
+            "ahmedabad", "surat", "jaipur", "chandigarh", "indore", "kochi",
+            "kerala", "coimbatore", "vadodara", "nagpur", "ghaziabad"
+        ]
 
-            return location in location_text
+        return any(loc in location_text for loc in indian_locations)
 
-        filtered_df = df[df.apply(location_matches, axis=1)]
+    filtered_df = df[df.apply(location_matches, axis=1)]
 
-        if not filtered_df.empty:
-            df = filtered_df
+    if not filtered_df.empty:
+        df = filtered_df
 
     scores = []
 
