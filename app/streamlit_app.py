@@ -1,7 +1,13 @@
+Here is the corrected code with fixes applied exclusively for runtime errors and edge-case bugs (such as path resolution issues when running from root vs subdirectories, handling empty evaluation metrics crashing `st.columns(0)`, and preventing `pandas` NaN/None values from displaying as `"nan"` text):
+
+```python
 import sys
 from pathlib import Path
+import math
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# Automatically resolve project root regardless of whether app.py is placed in root or a subfolder
+CURRENT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = CURRENT_DIR if (CURRENT_DIR / "src").exists() else CURRENT_DIR.parent
 
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
@@ -13,6 +19,17 @@ from src.parsing.resume_parser import parse_resume
 from src.search.job_search import match_jobs
 from src.generate.cv_suggestions import generate_cv_suggestions
 from src.mentor.rag_chain import ask_mentor
+
+
+# Helper function to prevent pandas NaN/None values from rendering as 'nan' or 'None'
+def get_clean_field(row, field, default=""):
+    val = row.get(field, default)
+    if val is None or (isinstance(val, float) and math.isnan(val)):
+        return default
+    val_str = str(val).strip()
+    if val_str.lower() in ("nan", "none", "<na>", "null", ""):
+        return default
+    return val_str
 
 
 # =========================================================
@@ -674,25 +691,22 @@ elif page == "💼 Job Matches":
 
                         for _, row in results.iterrows():
 
-                            job_title = str(
-                                row.get(
-                                    "jobtitle",
-                                    "Job Title Not Available"
-                                )
+                            job_title = get_clean_field(
+                                row,
+                                "jobtitle",
+                                "Job Title Not Available"
                             )
 
-                            company = str(
-                                row.get(
-                                    "company",
-                                    "Company Not Available"
-                                )
+                            company = get_clean_field(
+                                row,
+                                "company",
+                                "Company Not Available"
                             )
 
-                            job_location = str(
-                                row.get(
-                                    "joblocation_address",
-                                    "Location Not Available"
-                                )
+                            job_location = get_clean_field(
+                                row,
+                                "joblocation_address",
+                                "Location Not Available"
                             )
 
                             score = row.get(
@@ -700,39 +714,34 @@ elif page == "💼 Job Matches":
                                 0
                             )
 
-                            job_skills = str(
-                                row.get(
-                                    "skills",
-                                    ""
-                                )
+                            job_skills = get_clean_field(
+                                row,
+                                "skills",
+                                ""
                             )
 
-                            description = str(
-                                row.get(
-                                    "jobdescription",
-                                    ""
-                                )
+                            description = get_clean_field(
+                                row,
+                                "jobdescription",
+                                ""
                             )
 
-                            education = str(
-                                row.get(
-                                    "education",
-                                    ""
-                                )
+                            education = get_clean_field(
+                                row,
+                                "education",
+                                ""
                             )
 
-                            experience = str(
-                                row.get(
-                                    "experience",
-                                    ""
-                                )
+                            experience = get_clean_field(
+                                row,
+                                "experience",
+                                ""
                             )
 
-                            payrate = str(
-                                row.get(
-                                    "payrate",
-                                    ""
-                                )
+                            payrate = get_clean_field(
+                                row,
+                                "payrate",
+                                ""
                             )
 
                             with st.container(
@@ -755,31 +764,31 @@ elif page == "💼 Job Matches":
                                     f"🎯 **Match Score:** {score}"
                                 )
 
-                                if education and education != "nan":
+                                if education:
 
                                     st.write(
                                         f"🎓 **Education:** {education}"
                                     )
 
-                                if experience and experience != "nan":
+                                if experience:
 
                                     st.write(
                                         f"💼 **Experience:** {experience}"
                                     )
 
-                                if payrate and payrate != "nan":
+                                if payrate:
 
                                     st.write(
                                         f"💰 **Pay:** {payrate}"
                                     )
 
-                                if job_skills and job_skills != "nan":
+                                if job_skills:
 
                                     st.write(
                                         f"🛠️ **Required Skills:** {job_skills}"
                                     )
 
-                                if description and description != "nan":
+                                if description:
 
                                     if len(description) > 500:
 
@@ -1065,23 +1074,31 @@ elif page == "📊 System Evaluation":
                     dict
                 ):
 
-                    metric_cols = st.columns(
-                        len(evaluation)
-                    )
+                    if len(evaluation) > 0:
 
-                    for index, (
-                        key,
-                        value
-                    ) in enumerate(
-                        evaluation.items()
-                    ):
+                        metric_cols = st.columns(
+                            len(evaluation)
+                        )
 
-                        with metric_cols[index]:
+                        for index, (
+                            key,
+                            value
+                        ) in enumerate(
+                            evaluation.items()
+                        ):
 
-                            st.metric(
-                                label=str(key),
-                                value=str(value)
-                            )
+                            with metric_cols[index]:
+
+                                st.metric(
+                                    label=str(key),
+                                    value=str(value)
+                                )
+
+                    else:
+
+                        st.info(
+                            "ℹ️ No evaluation metrics were returned."
+                        )
 
                 else:
 
@@ -1102,3 +1119,5 @@ elif page == "📊 System Evaluation":
                 st.error(
                     f"❌ Evaluation failed: {e}"
                 )
+
+```
