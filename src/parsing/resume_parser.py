@@ -1,3 +1,4 @@
+import time
 from google import genai
 from pydantic import BaseModel, Field
 from typing import List
@@ -82,13 +83,35 @@ Resume:
 {resume_text}
 """
 
-    response = client.models.generate_content(
-        model=MODEL_NAME,
-        contents=prompt,
-        config={
-            "response_mime_type": "application/json",
-            "response_schema": ResumeProfile,
-        },
-    )
+    # Backup models if primary MODEL_NAME experiences high demand / 503 errors
+    fallback_models = [MODEL_NAME, "gemini-1.5-flash", "gemini-2.0-flash"]
+    models_to_try = list(dict.fromkeys(fallback_models))
 
-    return ResumeProfile.model_validate_json(response.text)
+    last_exception = None
+
+    for model_id in models_to_try:
+        for attempt in range(3):
+            try:
+                response = client.models.generate_content(
+                    model=model_id,
+                    contents=prompt,
+                    config={
+                        "response_mime_type": "application/json",
+                        "response_schema": ResumeProfile,
+                    },
+                )
+                return ResumeProfile.model_validate_json(response.text)
+
+            except Exception as e:
+                last_exception = e
+                err_str = str(e)
+                # Retry if server is unavailable (503) or rate-limited (429)
+                if "503" in err_str or "UNAVAILABLE" in err_str or "429" in err_str:
+                    time.sleep(2 * (attempt + 1))  # Exponential delay (2s, 4s, 6s)
+                    continue
+                else:
+                    raise e
+
+    raise RuntimeError(
+        f"Resume parsing failed due to high server load: {last_exception}"
+    )
