@@ -371,7 +371,7 @@ elif page == "📄 Resume Analyzer":
                         st.session_state.job_results = None
 
                         st.success(
-                            "🎉 Resume analyzed successfully!"
+                            "Resume analyzed successfully!"
                         )
 
                         st.info(
