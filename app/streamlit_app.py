@@ -703,7 +703,7 @@ elif page == "💼 Job Matches":
             else:
 
                 st.success(
-                    f"🎉 Found {len(results)} matching jobs for '{job_role}'!"
+                    f" Found {len(results)} matching jobs for '{job_role}'!"
                 )
 
                 for _, row in results.iterrows():
@@ -860,7 +860,7 @@ elif page == "✨ Resume Improvement":
                     st.session_state.cv_suggestions = suggestions
 
                     st.success(
-                        "🎉 Resume improvement suggestions generated!"
+                        "Resume improvement suggestions generated!"
                     )
 
                 except Exception as e:
