@@ -1,3 +1,5 @@
+import time
+
 from google import genai
 from google.genai import errors as genai_errors
 
@@ -55,7 +57,12 @@ def load_career_notes():
             )
 
     combined_notes = "\n\n".join(notes)
-    return combined_notes if combined_notes.strip() else "No specific documents loaded."
+
+    return (
+        combined_notes
+        if combined_notes.strip()
+        else "No specific documents loaded."
+    )
 
 
 # ============================================================
@@ -75,27 +82,92 @@ def ask_mentor(question):
         context=context
     )
 
-    try:
+    # Primary model + fallback model
+    models_to_try = [
+        MODEL_NAME,
+        "gemini-3.1-flash-lite"
+    ]
 
-        response = client.models.generate_content(
-            model=MODEL_NAME,
-            contents=prompt
-        )
+    # Remove duplicate model names
+    models_to_try = list(dict.fromkeys(
+        str(model).replace("models/", "").strip()
+        for model in models_to_try
+        if model
+    ))
 
-        return response.text
+    last_exception = None
 
-    except genai_errors.ClientError as e:
+    for model_id in models_to_try:
 
-        if e.code == 429:
+        for attempt in range(3):
 
-            return (
-                "⚠️ The AI mentor has hit its daily free-tier "
-                "quota with Gemini. Please try again later, or "
-                "switch to a model/plan with a higher limit."
-            )
+            try:
 
-        return f"❌ Gemini request failed ({e.code}): {e.message}"
+                response = client.models.generate_content(
+                    model=model_id,
+                    contents=prompt
+                )
 
-    except Exception as e:
+                return response.text
 
-        return f"❌ Unexpected mentor error: {e}"
+            except genai_errors.ClientError as e:
+
+                last_exception = e
+
+                # Retry temporary Gemini errors
+                if e.code in [429, 503]:
+
+                    if attempt < 2:
+
+                        # 3 sec → 6 sec → 12 sec
+                        time.sleep(
+                            3 * (2 ** attempt)
+                        )
+
+                        continue
+
+                    # Current model failed.
+                    # Move to fallback model.
+                    break
+
+                # Other Gemini errors should not be
+                # repeatedly retried.
+                return (
+                    f"❌ Gemini request failed "
+                    f"({e.code}): {e.message}"
+                )
+
+            except Exception as e:
+
+                last_exception = e
+
+                error = str(e)
+
+                # Handle temporary service errors
+                if (
+                    "503" in error
+                    or "UNAVAILABLE" in error
+                    or "429" in error
+                    or "RESOURCE_EXHAUSTED" in error
+                ):
+
+                    if attempt < 2:
+
+                        time.sleep(
+                            3 * (2 ** attempt)
+                        )
+
+                        continue
+
+                    # Try fallback model
+                    break
+
+                return f"❌ Unexpected mentor error: {e}"
+
+    return (
+        "⚠️ Gemini is temporarily unavailable. "
+        "The AI Career Mentor automatically tried "
+        "again and used its fallback model, but the "
+        "request could not be completed right now. "
+        "Please try again in a moment."
+    )
