@@ -83,21 +83,46 @@ Resume:
 {resume_text}
 """
 
-    # Ensure model strings don't include 'models/' prefix and prioritize working modern models
-    raw_models = [MODEL_NAME, "gemini-3.6-flash"]
+    # ============================================================
+    # GEMINI MODELS
+    # ============================================================
+
+    raw_models = [
+        MODEL_NAME,
+        "gemini-3.1-flash-lite"
+    ]
+
     models_to_try = []
-    
+
     for m in raw_models:
+
         if m:
-            clean_m = str(m).replace("models/", "").strip()
+
+            clean_m = (
+                str(m)
+                .replace("models/", "")
+                .strip()
+            )
+
             if clean_m not in models_to_try:
-                models_to_try.append(clean_m)
+
+                models_to_try.append(
+                    clean_m
+                )
 
     last_exception = None
 
+
+    # ============================================================
+    # TRY PRIMARY MODEL + FALLBACK MODEL
+    # ============================================================
+
     for model_id in models_to_try:
+
         for attempt in range(3):
+
             try:
+
                 response = client.models.generate_content(
                     model=model_id,
                     contents=prompt,
@@ -106,23 +131,72 @@ Resume:
                         "response_schema": ResumeProfile,
                     },
                 )
-                return ResumeProfile.model_validate_json(response.text)
+
+                return ResumeProfile.model_validate_json(
+                    response.text
+                )
+
 
             except Exception as e:
+
                 last_exception = e
+
                 err_str = str(e)
-                
-                # If 404 NOT_FOUND occurs, break attempt loop and switch to next model immediately
-                if "404" in err_str or "NOT_FOUND" in err_str:
+
+
+                # ====================================================
+                # MODEL NOT FOUND
+                # Immediately try the next model
+                # ====================================================
+
+                if (
+                    "404" in err_str
+                    or "NOT_FOUND" in err_str
+                ):
+
                     break
 
-                # Retry if server is unavailable (503) or rate-limited (429)
-                if "503" in err_str or "UNAVAILABLE" in err_str or "429" in err_str:
-                    time.sleep(2 * (attempt + 1))  # Exponential delay (2s, 4s, 6s)
-                    continue
-                else:
-                    break  # Try next model for other unhandled model-specific errors
+
+                # ====================================================
+                # TEMPORARY GEMINI ERROR
+                # 503 / 429
+                # ====================================================
+
+                if (
+                    "503" in err_str
+                    or "UNAVAILABLE" in err_str
+                    or "429" in err_str
+                    or "RESOURCE_EXHAUSTED" in err_str
+                    or "high demand" in err_str.lower()
+                ):
+
+                    if attempt < 2:
+
+                        # 3 sec → 6 sec → 12 sec
+                        time.sleep(
+                            3 * (2 ** attempt)
+                        )
+
+                        continue
+
+                    # Current model failed after retries.
+                    # Move to fallback model.
+                    break
+
+
+                # ====================================================
+                # OTHER ERROR
+                # Try next model
+                # ====================================================
+
+                break
+
+
+    # ============================================================
+    # ALL MODELS FAILED
+    # ============================================================
 
     raise RuntimeError(
-        f"Resume parsing failed across all attempted models. Last error: {last_exception}"
+        "Resume parsing failed across all attempted "
+        f"Gemini models. Last error: {last_exception}"
     )
