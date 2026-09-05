@@ -1,3 +1,4 @@
+
 import time
 
 from google import genai
@@ -82,20 +83,33 @@ def ask_mentor(question):
         context=context
     )
 
-    # Primary model + fallback model
+
+    # ========================================================
+    # PRIMARY MODEL + FALLBACK MODEL
+    # ========================================================
+
     models_to_try = [
         MODEL_NAME,
         "gemini-3.1-flash-lite"
     ]
 
+
     # Remove duplicate model names
     models_to_try = list(dict.fromkeys(
-        str(model).replace("models/", "").strip()
+        str(model)
+        .replace("models/", "")
+        .strip()
         for model in models_to_try
         if model
     ))
 
+
     last_exception = None
+
+
+    # ========================================================
+    # TRY EACH MODEL
+    # ========================================================
 
     for model_id in models_to_try:
 
@@ -110,11 +124,19 @@ def ask_mentor(question):
 
                 return response.text
 
+
+            # ====================================================
+            # GEMINI CLIENT ERROR
+            # ====================================================
+
             except genai_errors.ClientError as e:
 
                 last_exception = e
 
-                # Retry temporary Gemini errors
+                # -----------------------------------------------
+                # RETRY 429 / 503
+                # -----------------------------------------------
+
                 if e.code in [429, 503]:
 
                     if attempt < 2:
@@ -127,15 +149,23 @@ def ask_mentor(question):
                         continue
 
                     # Current model failed.
-                    # Move to fallback model.
+                    # Try fallback model.
                     break
 
-                # Other Gemini errors should not be
-                # repeatedly retried.
+
+                # -----------------------------------------------
+                # OTHER CLIENT ERRORS
+                # -----------------------------------------------
+
                 return (
                     f"❌ Gemini request failed "
                     f"({e.code}): {e.message}"
                 )
+
+
+            # ====================================================
+            # OTHER ERRORS
+            # ====================================================
 
             except Exception as e:
 
@@ -143,31 +173,61 @@ def ask_mentor(question):
 
                 error = str(e)
 
-                # Handle temporary service errors
+
+                # -----------------------------------------------
+                # TEMPORARY SERVICE / QUOTA ERRORS
+                # -----------------------------------------------
+
                 if (
                     "503" in error
                     or "UNAVAILABLE" in error
                     or "429" in error
                     or "RESOURCE_EXHAUSTED" in error
+                    or "high demand" in error.lower()
                 ):
 
                     if attempt < 2:
 
+                        # 3 sec → 6 sec → 12 sec
                         time.sleep(
                             3 * (2 ** attempt)
                         )
 
                         continue
 
+                    # Current model failed.
+                    # Try fallback model.
+                    break
+
+
+                # -----------------------------------------------
+                # MODEL NOT FOUND
+                # -----------------------------------------------
+
+                if (
+                    "404" in error
+                    or "NOT_FOUND" in error
+                ):
+
                     # Try fallback model
                     break
 
-                return f"❌ Unexpected mentor error: {e}"
+
+                # -----------------------------------------------
+                # OTHER UNEXPECTED ERROR
+                # -----------------------------------------------
+
+                return (
+                    f"❌ Unexpected mentor error: {e}"
+                )
+
+
+    # ========================================================
+    # ALL MODELS FAILED
+    # ========================================================
 
     return (
-        "⚠️ Gemini is temporarily unavailable. "
-        "The AI Career Mentor automatically tried "
-        "again and used its fallback model, but the "
-        "request could not be completed right now. "
-        "Please try again in a moment."
+        "❌ Gemini failed after trying all available models.\n\n"
+        f"Last error: {last_exception}"
     )
+
