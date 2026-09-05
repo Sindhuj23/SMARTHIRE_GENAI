@@ -12,11 +12,11 @@ if "GEMINI_API_KEY" in st.secrets:
 else:
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# 2. Default to gemini-1.5-flash to prevent 503 capacity issues
+# 2. Default Gemini model
 if "MODEL_NAME" in st.secrets:
     MODEL_NAME = st.secrets["MODEL_NAME"]
 else:
-    MODEL_NAME = os.getenv("MODEL_NAME", "gemini-3.6-flash")
+    MODEL_NAME = os.getenv("MODEL_NAME", "gemini-3.1-flash-lite")
 
 # Data directories setup
 DATA_DIR = PROJECT_ROOT / "data"
