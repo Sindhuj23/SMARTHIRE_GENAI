@@ -81,7 +81,7 @@ st.markdown(
        MAIN TITLE
        ===================================================== */
 
-   .main-title {
+  .main-title {
     font-size: 40px !important;
     font-weight: 800 !important;
     text-align: center !important;
