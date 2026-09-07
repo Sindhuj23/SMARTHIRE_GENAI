@@ -81,17 +81,20 @@ st.markdown(
        MAIN TITLE
        ===================================================== */
 
-    .main-title {
-        font-size: 40px !important;
-        font-weight: 800 !important;
-        text-align: center !important;
-        margin-top: 0px !important;
-        margin-bottom: 5px !important;
-        color:#A855F7 !important;
-        text-shadow: none !important;
-        box-shadow: none !important;
-        filter: none !important;
-    }
+   .main-title {
+    font-size: 40px !important;
+    font-weight: 800 !important;
+    text-align: center !important;
+    margin-top: 0px !important;
+    margin-bottom: 5px !important;
+    background: linear-gradient(90deg, #7C3AED, #C084FC) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
 
     /* =====================================================
        SUBTITLE
