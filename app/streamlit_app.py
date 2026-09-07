@@ -96,10 +96,6 @@ st.markdown(
     filter: none !important;
 }
 
-.emoji-fix {
-    -webkit-text-fill-color: initial !important;
-    background: none !important;
-}
 
     /* =====================================================
        SUBTITLE
