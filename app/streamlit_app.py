@@ -222,7 +222,7 @@ with st.sidebar:
 st.markdown(
     """
     <div class="main-title">
-        🚀 SmartHire GenAI — Career Portal &amp; AI Mentor
+        🤖 SmartHire GenAI — Career Portal &amp; AI Mentor
     </div>
     """,
     unsafe_allow_html=True
