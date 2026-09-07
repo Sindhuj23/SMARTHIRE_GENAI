@@ -35,7 +35,7 @@ def get_clean_field(row, field, default=""):
 
 st.set_page_config(
     page_title="SmartHire GenAI — Career Portal & AI Mentor",
-    page_icon="🚀",
+    page_icon="🤖",
     layout="wide",
     initial_sidebar_state="expanded"
 )
