@@ -87,7 +87,7 @@ st.markdown(
         text-align: center !important;
         margin-top: 0px !important;
         margin-bottom: 5px !important;
-        color: #a855f7 !important;
+        color: #c084fc !important;
         text-shadow: none !important;
         box-shadow: none !important;
         filter: none !important;
