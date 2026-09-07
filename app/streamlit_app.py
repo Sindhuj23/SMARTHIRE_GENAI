@@ -81,7 +81,7 @@ st.markdown(
        MAIN TITLE
        ===================================================== */
 
-  .main-title {
+.main-title {
     font-size: 40px !important;
     font-weight: 800 !important;
     text-align: center !important;
@@ -94,6 +94,11 @@ st.markdown(
     text-shadow: none !important;
     box-shadow: none !important;
     filter: none !important;
+}
+
+.emoji-fix {
+    -webkit-text-fill-color: initial !important;
+    background: none !important;
 }
 
     /* =====================================================
