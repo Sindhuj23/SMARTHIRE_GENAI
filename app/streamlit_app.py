@@ -242,7 +242,7 @@ st.markdown(
 # DASHBOARD
 # =========================================================
 
-if page == "🏠 Dashboard":
+if page == "Dashboard":
 
     st.markdown(
         """
@@ -530,7 +530,7 @@ elif page == "👤 My Profile":
         # PROJECTS
         # =================================================
 
-        st.subheader("🚀 Projects")
+        st.subheader("📂 Projects")
 
         projects = getattr(
             profile,
