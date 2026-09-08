@@ -247,7 +247,7 @@ if page == "Dashboard":
     st.markdown(
         """
         <div class="card">
-            <h2>👋 Welcome to SmartHire!</h2>
+            <h2>Welcome to SmartHire!</h2>
             <p>
             SmartHire is an AI-powered career assistant that analyzes
             resumes, matches jobs, improves CVs, provides career
