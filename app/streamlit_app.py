@@ -35,7 +35,7 @@ def get_clean_field(row, field, default=""):
 
 st.set_page_config(
     page_title="SmartHire GenAI — Career Portal & AI Mentor",
-    page_icon="🚀",
+    page_icon=" ",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -222,7 +222,7 @@ with st.sidebar:
 st.markdown(
     """
     <div class="main-title">
-        <span style="-webkit-text-fill-color: initial;">🚀</span> SmartHire GenAI — Career Portal &amp; AI Mentor
+        <span style="-webkit-text-fill-color: initial;"></span> SmartHire GenAI — Career Portal &amp; AI Mentor
     </div>
     """,
     unsafe_allow_html=True
@@ -556,7 +556,7 @@ elif page == "👤 My Profile":
         # CERTIFICATIONS
         # =================================================
 
-        st.subheader("🏆 Certifications")
+        st.subheader("🏅 Certifications")
 
         certifications = getattr(
             profile,
@@ -569,7 +569,7 @@ elif page == "👤 My Profile":
             for item in certifications:
 
                 st.write(
-                    f"🏆 {item}"
+                    f"🏅 {item}"
                 )
 
         else:
