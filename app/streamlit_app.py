@@ -439,9 +439,9 @@ elif page == "👤 My Profile":
             f"""
             <div class="card">
                 <h2>{name}</h2>
-                <p>🎯 <b>Target Role:</b> {target_role}</p>
-                <p>📧 <b>Email:</b> {email}</p>
-                <p>📱 <b>Phone:</b> {phone}</p>
+                <p><b>Target Role:</b> {target_role}</p>
+                <p><b>Email:</b> {email}</p>
+                <p><b>Phone:</b> {phone}</p>
             </div>
             """,
             unsafe_allow_html=True
