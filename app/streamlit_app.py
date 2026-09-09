@@ -491,7 +491,7 @@ elif page == "👤 My Profile":
             for item in education:
 
                 st.write(
-                    f"🎓 {item}"
+                    f"{item}"
                 )
 
         else:
@@ -517,7 +517,7 @@ elif page == "👤 My Profile":
             for item in experience:
 
                 st.write(
-                    f"💼 {item}"
+                    f"{item}"
                 )
 
         else:
@@ -569,7 +569,7 @@ elif page == "👤 My Profile":
             for item in certifications:
 
                 st.write(
-                    f"🏅 {item}"
+                    f"{item}"
                 )
 
         else:
