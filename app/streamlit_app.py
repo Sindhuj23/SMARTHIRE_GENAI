@@ -451,7 +451,7 @@ elif page == "👤 My Profile":
         # SKILLS
         # =================================================
 
-        st.subheader("Skills")
+        st.subheader("➢ Skills")
 
         skills = getattr(
             profile,
@@ -478,7 +478,7 @@ elif page == "👤 My Profile":
         # EDUCATION
         # =================================================
 
-        st.subheader("🎓 Education")
+        st.subheader("➢ Education")
 
         education = getattr(
             profile,
@@ -504,7 +504,7 @@ elif page == "👤 My Profile":
         # EXPERIENCE
         # =================================================
 
-        st.subheader("💼 Experience")
+        st.subheader("➢ Experience")
 
         experience = getattr(
             profile,
@@ -530,7 +530,7 @@ elif page == "👤 My Profile":
         # PROJECTS
         # =================================================
 
-        st.subheader("📂 Projects")
+        st.subheader("➢ Projects")
 
         projects = getattr(
             profile,
@@ -556,7 +556,7 @@ elif page == "👤 My Profile":
         # CERTIFICATIONS
         # =================================================
 
-        st.subheader("🏅 Certifications")
+        st.subheader("➢ Certifications")
 
         certifications = getattr(
             profile,
