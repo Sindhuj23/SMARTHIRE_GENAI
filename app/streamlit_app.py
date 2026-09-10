@@ -451,7 +451,7 @@ elif page == "👤 My Profile":
         # SKILLS
         # =================================================
 
-        st.subheader("🛠️ Skills")
+        st.subheader("Skills")
 
         skills = getattr(
             profile,
